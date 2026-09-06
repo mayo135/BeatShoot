@@ -1,0 +1,30 @@
+# Silhouette target - materials
+newmtl M_Board
+Kd 0.780 0.745 0.660
+Ks 0.030 0.030 0.030
+Ns 6.0
+illum 2
+
+newmtl M_Zone7
+Kd 0.700 0.665 0.590
+Ks 0.020 0.020 0.020
+Ns 4.0
+illum 2
+
+newmtl M_Zone8
+Kd 0.560 0.530 0.470
+Ks 0.020 0.020 0.020
+Ns 4.0
+illum 2
+
+newmtl M_Zone9
+Kd 0.360 0.340 0.305
+Ks 0.020 0.020 0.020
+Ns 4.0
+illum 2
+
+newmtl M_Zone10
+Kd 0.075 0.072 0.068
+Ks 0.020 0.020 0.020
+Ns 4.0
+illum 2

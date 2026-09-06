@@ -1,0 +1,32 @@
+# Barrett M82 style rifle - materials
+newmtl M_Body
+Ka 0.000 0.000 0.000
+Kd 0.115 0.118 0.125
+Ks 0.150 0.150 0.150
+Ns 24.0
+d 1.0
+illum 2
+
+newmtl M_Metal
+Ka 0.000 0.000 0.000
+Kd 0.085 0.087 0.092
+Ks 0.320 0.320 0.330
+Ns 64.0
+d 1.0
+illum 2
+
+newmtl M_Optic
+Ka 0.000 0.000 0.000
+Kd 0.048 0.048 0.055
+Ks 0.220 0.220 0.230
+Ns 48.0
+d 1.0
+illum 2
+
+newmtl M_Grip
+Ka 0.000 0.000 0.000
+Kd 0.095 0.095 0.098
+Ks 0.060 0.060 0.060
+Ns 8.0
+d 1.0
+illum 2
