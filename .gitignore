@@ -112,3 +112,16 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# ---- BeatShoot 固有 ----
+# エディタ / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Tools/ の Python スクリプトが生成するもの
+__pycache__/
+*.py[cod]
+.venv/
+venv/
