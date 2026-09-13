@@ -27,34 +27,73 @@ public class SniperShooter : MonoBehaviour
     public float maxDistance = 800f;
     public LayerMask targetMask = ~0;
 
+    [Header("曳光弾（トレーサー）")]
+    [Tooltip("弾の軌跡を表示する")]
+    public bool showTracer = true;
+
+    [Tooltip("弾速[m/s]。小さいほど軌跡をゆっくり追える")]
+    public float tracerSpeed = 260f;
+
+    [Tooltip("光る筋の長さ[m]")]
+    public float tracerLength = 12f;
+
+    [Tooltip("筋の太さ[m]")]
+    public float tracerWidth = 0.05f;
+
+    public Color tracerColor = new Color(1f, 0.85f, 0.35f, 1f);
+
     [Header("演出")]
     [Tooltip("命中痕（Quad など）。標的の前面に貼り付ける")]
     public GameObject bulletHolePrefab;
     public float bulletHoleLife = 30f;
 
+    [Header("心拍連動")]
+    [Tooltip("発砲で心拍を上げる先。未設定ならシーン内から自動で探します")]
+    public HeartRateProvider heartRate;
+
     [Header("集計")]
     public int totalScore;
     public int shotCount;
+
+    HeartbeatAimSway _sway;
+
+    void Awake()
+    {
+        if (!heartRate) heartRate = FindAnyObjectByType<HeartRateProvider>();
+    }
+
+    void ShowTracer(Vector3 start, Vector3 end)
+    {
+        if (!showTracer) return;
+        BulletTracer.Spawn(start, end, tracerSpeed, tracerLength, tracerWidth, tracerColor);
+    }
 
     /// <summary>1発撃つ。</summary>
     public void Fire()
     {
         shotCount++;
+        if (heartRate) heartRate.AddStress(heartRate.shotStress);
 
         // 弾道は「狙っている視点」から飛ばす（銃口から飛ばすと画面中央とズレるため）。
         // aimSource が未設定なら銃口、それも無ければ自分自身の向きを使う。
         Transform src = aimSource ? aimSource : (muzzle ? muzzle : transform);
         Vector3 origin = src.position;
-        Vector3 dir = src.forward;
 
-        // Scene ビューで弾道を確認できるようにする
-        Debug.DrawRay(origin, dir * maxDistance, Color.yellow, 2f);
+        // 心拍による揺れ・バレットサークルがあればそれを反映した向きで撃つ
+        if (!_sway) _sway = src.GetComponent<HeartbeatAimSway>();
+        Vector3 dir = _sway ? _sway.GetShotDirection() : src.forward;
+
+        // 軌跡は見た目どおり銃口から出す（判定はカメラ基準のまま）
+        Vector3 tracerStart = muzzle ? muzzle.position : origin;
 
         if (!Physics.Raycast(origin, dir, out RaycastHit hit, maxDistance, targetMask))
         {
+            ShowTracer(tracerStart, origin + dir * maxDistance);
             Debug.Log("Miss (何にも当たらず)");
             return;
         }
+
+        ShowTracer(tracerStart, hit.point);
 
         // 標的本体、または親についている TargetScoreZones を探す
         var zones = hit.collider.GetComponentInParent<TargetScoreZones>();
@@ -92,12 +131,10 @@ public class SniperShooter : MonoBehaviour
     {
 #if ENABLE_INPUT_SYSTEM
         // --- Input System パッケージ（Unity 6 の既定） ---
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) return true;
-        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame) return true;
-        return false;
+        return Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
 #else
         // --- 旧 Input Manager ---
-        return Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space);
+        return Input.GetMouseButtonDown(0);
 #endif
     }
 }
